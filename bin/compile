@@ -29,6 +29,11 @@ function indent() {
   esac
 }
 
+echo "-----> CI? $CI"
+echo "-----> CI_NODE_INDEX: $CI_NODE_INDEX"
+echo "-----> CI_NODE_TOTAL: $CI_NODE_TOTAL"
+echo "-----> HEROKU_TEST_RUN_ID: $HEROKU_TEST_RUN_ID"
+
 if [ "$CI" = "true" ]; then
   echo "-----> CI environment detected"
   # TODO: Only set on 2nd half of CI nodes
@@ -37,16 +42,18 @@ if [ "$CI" = "true" ]; then
   echo "export DEPENDENCIES_NEXT=$DEPENDENCIES_NEXT" >> $BUILDPACK_DIR/export
 fi
 
-echo "-----> Moving Gemfile to Gemfile_prev"
+echo "-----> Shuffling Gemfiles"
+
+echo "Moving Gemfile to Gemfile_prev" | indent
 mv "$BUILD_DIR/Gemfile" "$BUILD_DIR/Gemfile_prev"
 
-echo "-----> Moving Gemfile.lock to Gemfile_prev.lock"
+echo "Moving Gemfile.lock to Gemfile_prev.lock" | indent
 mv "$BUILD_DIR/Gemfile.lock" "$BUILD_DIR/Gemfile_prev.lock"
 
-echo "-----> Moving Gemfile_next to Gemfile"
+echo "Moving Gemfile_next to Gemfile" | indent
 mv "$BUILD_DIR/Gemfile_next" "$BUILD_DIR/Gemfile"
 
-echo "-----> Moving Gemfile_next.lock to Gemfile.lock"
+echo "Moving Gemfile_next.lock to Gemfile.lock" | indent
 mv "$BUILD_DIR/Gemfile_next.lock" "$BUILD_DIR/Gemfile.lock"
 
 echo "-----> Multiple Gemfiles done"
