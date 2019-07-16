@@ -1,0 +1,51 @@
+#!/usr/bin/env bash
+# bin/compile <build-dir> <cache-dir>
+
+# This was a great aid to writing this script:
+# https://github.com/heroku/heroku-buildpack-ci-postgresql/blob/master/bin/compile
+
+# fail fast
+set -e
+
+# debug
+set -x
+
+# parse and derive params
+BUILD_DIR=$1
+CACHE_DIR=$2
+ENV_DIR=$3
+BUILDPACK_DIR="$(dirname $(dirname $0))"
+
+function error() {
+  echo " !     $*" >&2
+  exit 1
+}
+
+function indent() {
+  c='s/^/       /'
+  case $(uname) in
+    Darwin) sed -l "$c";;
+    *)      sed -u "$c";;
+  esac
+}
+
+if $CI
+  # TODO: Only set on 2nd half of CI nodes
+  echo "-----> Setting DEPENDENCIES_NEXT"
+  export DEPENDENCIES_NEXT=1
+  echo "export DEPENDENCIES_NEXT=$DEPENDENCIES_NEXT" >> $BUILDPACK_DIR/export
+fi
+
+echo "-----> Moving Gemfile to Gemfile_prev"
+mv "$BUILD_DIR/Gemfile" "$BUILD_DIR/Gemfile_prev"
+
+echo "-----> Moving Gemfile.lock to Gemfile_prev.lock"
+mv "$BUILD_DIR/Gemfile.lock" "$BUILD_DIR/Gemfile_prev.lock"
+
+echo "-----> Moving Gemfile_next to Gemfile"
+mv "$BUILD_DIR/Gemfile_next" "$BUILD_DIR/Gemfile"
+
+echo "-----> Moving Gemfile_next.lock to Gemfile.lock"
+mv "$BUILD_DIR/Gemfile_next.lock" "$BUILD_DIR/Gemfile.lock"
+
+echo "-----> Multiple Gemfiles done"
