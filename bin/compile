@@ -29,7 +29,8 @@ function indent() {
   esac
 }
 
-if $CI
+if [ "$CI" = "true" ]; then
+  echo "-----> CI environment detected"
   # TODO: Only set on 2nd half of CI nodes
   echo "-----> Setting DEPENDENCIES_NEXT"
   export DEPENDENCIES_NEXT=1
