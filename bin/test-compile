@@ -31,8 +31,10 @@ function indent() {
   esac
 }
 
+echo "Is REDIS_URL available yet? REDIS_URL: $REDIS_URL END"
+
 if (( $RANDOM % 2 == 0 )); then
-  # TODO: Only set on 2nd half of CI nodes
+  # TODO: Use more reliable technique, e.g. sequence setup on shared db (redis or pg addon?)
   echo "-----> Setting DEPENDENCIES_NEXT"
   export DEPENDENCIES_NEXT=1
   echo "export DEPENDENCIES_NEXT=$DEPENDENCIES_NEXT" >> $BUILDPACK_DIR/export
