@@ -38,7 +38,9 @@ echo "-----> HEROKU_TEST_RUN_ID: $HEROKU_TEST_RUN_ID"
 echo "Env vars:"
 env
 
-coin_toss=1
+let n=$RANDOM
+let coin_toss=$n%2
+echo $coin_toss
 #$(($RANDOM%2))
 echo "Coin toss is: $coin_toss"
 
