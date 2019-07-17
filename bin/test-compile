@@ -31,20 +31,14 @@ function indent() {
   esac
 }
 
-echo "-----> CI? $CI"
-echo "-----> CI_NODE_INDEX: $CI_NODE_INDEX"
-echo "-----> CI_NODE_TOTAL: $CI_NODE_TOTAL"
-echo "-----> HEROKU_TEST_RUN_ID: $HEROKU_TEST_RUN_ID"
-echo "Env vars:"
-env
+# echo "-----> CI? $CI"
+# echo "-----> CI_NODE_INDEX: $CI_NODE_INDEX"
+# echo "-----> CI_NODE_TOTAL: $CI_NODE_TOTAL"
+# echo "-----> HEROKU_TEST_RUN_ID: $HEROKU_TEST_RUN_ID"
+# echo "Env vars:"
+# env
 
-n=$RANDOM
-coin_toss=$n%2
-echo $coin_toss
-#$(($RANDOM%2))
-echo "Coin toss is: $coin_toss"
-
-if [ $coin_toss -eq 0 ]; then
+if (( $RANDOM % 2 == 0 )); then
   # TODO: Only set on 2nd half of CI nodes
   echo "-----> Setting DEPENDENCIES_NEXT"
   export DEPENDENCIES_NEXT=1
