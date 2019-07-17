@@ -33,14 +33,21 @@ echo "-----> CI? $CI"
 echo "-----> CI_NODE_INDEX: $CI_NODE_INDEX"
 echo "-----> CI_NODE_TOTAL: $CI_NODE_TOTAL"
 echo "-----> HEROKU_TEST_RUN_ID: $HEROKU_TEST_RUN_ID"
+echo "Env vars:"
+env
 
-if [ "$CI" = "true" ]; then
+
+#if [ "$CI" = "true" ]; then
   echo "-----> CI environment detected"
-  # TODO: Only set on 2nd half of CI nodes
-  echo "-----> Setting DEPENDENCIES_NEXT"
-  export DEPENDENCIES_NEXT=1
-  echo "export DEPENDENCIES_NEXT=$DEPENDENCIES_NEXT" >> $BUILDPACK_DIR/export
-fi
+
+  let coin_toss=$(($RANDOM%2))
+  if [ $coin_toss -eq 1 ]; then
+    # TODO: Only set on 2nd half of CI nodes
+    echo "-----> Setting DEPENDENCIES_NEXT"
+    export DEPENDENCIES_NEXT=1
+    echo "export DEPENDENCIES_NEXT=$DEPENDENCIES_NEXT" >> $BUILDPACK_DIR/export
+  fi
+#fi
 
 echo "-----> Shuffling Gemfiles"
 
