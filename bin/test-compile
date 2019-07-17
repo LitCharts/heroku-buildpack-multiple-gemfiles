@@ -8,7 +8,7 @@
 set -e
 
 # debug
-#set -x
+set -x
 
 echo "-----> In bin/test-compile"
 
@@ -38,8 +38,8 @@ echo "-----> HEROKU_TEST_RUN_ID: $HEROKU_TEST_RUN_ID"
 echo "Env vars:"
 env
 
-let n=$RANDOM
-let coin_toss=$n%2
+n=$RANDOM
+coin_toss=$n%2
 echo $coin_toss
 #$(($RANDOM%2))
 echo "Coin toss is: $coin_toss"
