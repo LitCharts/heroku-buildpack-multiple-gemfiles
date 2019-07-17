@@ -31,10 +31,8 @@ function indent() {
   esac
 }
 
-echo "Is REDIS_URL available yet? REDIS_URL: $REDIS_URL END"
-
 if (( $RANDOM % 2 == 0 )); then
-  # TODO: Use more reliable technique, e.g. sequence setup on shared db (redis or pg addon?)
+  # TODO: Ask Heroku if env vars can be made available to all buildpacks sooner: CI_NODE_INDEX, CI_NODE_TOTAL
   echo "-----> Setting DEPENDENCIES_NEXT"
   export DEPENDENCIES_NEXT=1
   echo "export DEPENDENCIES_NEXT=$DEPENDENCIES_NEXT" >> $BUILDPACK_DIR/export
