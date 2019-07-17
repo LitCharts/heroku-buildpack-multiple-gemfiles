@@ -37,7 +37,7 @@ echo "Env vars:"
 env
 
 let coin_toss=$(($RANDOM%2))
-if [ $coin_toss -eq 1 ]; then
+if [ $coin_toss -eq 0 ]; then
   # TODO: Only set on 2nd half of CI nodes
   echo "-----> Setting DEPENDENCIES_NEXT"
   export DEPENDENCIES_NEXT=1
