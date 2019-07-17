@@ -31,12 +31,12 @@ function indent() {
   esac
 }
 
-# echo "-----> CI? $CI"
-# echo "-----> CI_NODE_INDEX: $CI_NODE_INDEX"
-# echo "-----> CI_NODE_TOTAL: $CI_NODE_TOTAL"
-# echo "-----> HEROKU_TEST_RUN_ID: $HEROKU_TEST_RUN_ID"
-# echo "Env vars:"
-# env
+echo "-----> CI? $CI"
+echo "-----> CI_NODE_INDEX: $CI_NODE_INDEX"
+echo "-----> CI_NODE_TOTAL: $CI_NODE_TOTAL"
+echo "-----> HEROKU_TEST_RUN_ID: $HEROKU_TEST_RUN_ID"
+echo "Env vars:"
+env
 
 if (( $RANDOM % 2 == 0 )); then
   # TODO: Only set on 2nd half of CI nodes
