@@ -1,0 +1,63 @@
+#!/usr/bin/env bash
+# bin/compile <build-dir> <cache-dir>
+
+# This was a great aid to writing this script:
+# https://github.com/heroku/heroku-buildpack-ci-postgresql/blob/master/bin/compile
+
+# fail fast
+set -e
+
+# debug
+set -x
+
+# parse and derive params
+BUILD_DIR=$1
+CACHE_DIR=$2
+ENV_DIR=$3
+BUILDPACK_DIR="$(dirname $(dirname $0))"
+
+function error() {
+  echo " !     $*" >&2
+  exit 1
+}
+
+function indent() {
+  c='s/^/       /'
+  case $(uname) in
+    Darwin) sed -l "$c";;
+    *)      sed -u "$c";;
+  esac
+}
+
+echo "-----> CI? $CI"
+echo "-----> CI_NODE_INDEX: $CI_NODE_INDEX"
+echo "-----> CI_NODE_TOTAL: $CI_NODE_TOTAL"
+echo "-----> HEROKU_TEST_RUN_ID: $HEROKU_TEST_RUN_ID"
+echo "Env vars:"
+env
+
+let coin_toss=$(($RANDOM%2))
+if [ $coin_toss -eq 1 ]; then
+  # TODO: Only set on 2nd half of CI nodes
+  echo "-----> Setting DEPENDENCIES_NEXT"
+  export DEPENDENCIES_NEXT=1
+  echo "export DEPENDENCIES_NEXT=$DEPENDENCIES_NEXT" >> $BUILDPACK_DIR/export
+
+  echo "-----> Shuffling Gemfiles"
+
+  echo "Moving Gemfile to Gemfile_prev" | indent
+  mv "$BUILD_DIR/Gemfile" "$BUILD_DIR/Gemfile_prev"
+
+  echo "Moving Gemfile.lock to Gemfile_prev.lock" | indent
+  mv "$BUILD_DIR/Gemfile.lock" "$BUILD_DIR/Gemfile_prev.lock"
+
+  echo "Moving Gemfile_next to Gemfile" | indent
+  mv "$BUILD_DIR/Gemfile_next" "$BUILD_DIR/Gemfile"
+
+  echo "Moving Gemfile_next.lock to Gemfile.lock" | indent
+  mv "$BUILD_DIR/Gemfile_next.lock" "$BUILD_DIR/Gemfile.lock"
+else
+  echo "-----> Use default Gemfile and Gemfile.lock"
+fi
+
+echo "-----> Multiple Gemfiles done"
