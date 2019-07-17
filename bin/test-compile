@@ -8,7 +8,9 @@
 set -e
 
 # debug
-set -x
+#set -x
+
+echo "-----> In bin/test-compile"
 
 # parse and derive params
 BUILD_DIR=$1
@@ -36,7 +38,9 @@ echo "-----> HEROKU_TEST_RUN_ID: $HEROKU_TEST_RUN_ID"
 echo "Env vars:"
 env
 
-let coin_toss=$(($RANDOM%2))
+let coin_toss=$(($RANDOM%2));
+echo "Coin toss is: $coin_toss"
+
 if [ $coin_toss -eq 0 ]; then
   # TODO: Only set on 2nd half of CI nodes
   echo "-----> Setting DEPENDENCIES_NEXT"
