@@ -40,7 +40,7 @@ cd $BUILD_DIR
 BUNDLE_GEMFILE=Gemfile_next bundle install --without development --path vendor/bundle --binstubs vendor/bundle/bin -j4 --deployment
 
 echo "-----> Writing .profile.d/multiple-gemfiles.sh to run on dyno startup"
-mkdir .profile.d
+mkdir -p .profile.d
 cat<<\EOF > .profile.d/multiple-gemfiles.sh
 # if [ -n "$DEPENDENCIES_NEXT_DYNOS" ]; then
 if [ -n "$DEPENDENCIES_NEXT_CI_NODES" ]; then
