@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# bin/compile <build-dir> <cache-dir>
+# bin/test-compile <build-dir> <cache-dir>
 
 # This was a great aid to writing this script:
 # https://github.com/heroku/heroku-buildpack-ci-postgresql/blob/master/bin/compile
@@ -48,22 +48,25 @@ if [ -n "$DEPENDENCIES_NEXT_CI_NODES" ]; then
   # TODO: Test on string without comma but single dyno name
   next_dynos=($(echo $DEPENDENCIES_NEXT_CI_NODES | tr "," " "))
 
-  # if [ -n "$DYNO" ]; then
-    # dyno=$DYNO
-  # elif [ -n "$CI_NODE_INDEX" ]; then
+  if [ -n "$DYNO" ]; then
+    dyno=$DYNO
+  elif [ -n "$CI_NODE_INDEX" ]; then
     dyno=$CI_NODE_INDEX
-  # fi
-
-  echo "Preparing Gemfile for dyno: $dyno"
+  fi
 
   for ((i=0; i<${#next_dynos[@]}; i++)); do
     if [[ ${next_dynos[$i]} == ${dyno} ]]; then
-      echo "Shuffling Gemfiles to use Gemfile_next"
+      echo "Setting DEPENDENCIES_NEXT for dyno: $dyno"
       export DEPENDENCIES_NEXT=1
-      mv "$HOME/Gemfile" "$HOME/Gemfile_prev"
-      mv "$HOME/Gemfile.lock" "$HOME/Gemfile_prev.lock"
-      mv "$HOME/Gemfile_next" "$HOME/Gemfile"
-      mv "$HOME/Gemfile_next.lock" "$HOME/Gemfile.lock"
+
+      if [ -e $HOME/Gemfile_next ]; then
+        echo "Preparing Gemfile for dyno: $dyno"
+        echo "Shuffling Gemfiles to use Gemfile_next"
+        mv "$HOME/Gemfile" "$HOME/Gemfile_prev"
+        mv "$HOME/Gemfile.lock" "$HOME/Gemfile_prev.lock"
+        mv "$HOME/Gemfile_next" "$HOME/Gemfile"
+        mv "$HOME/Gemfile_next.lock" "$HOME/Gemfile.lock"
+      fi
     fi
   done
 fi
