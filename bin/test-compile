@@ -36,11 +36,12 @@ function indent() {
 # install the missing gems from Gemfile_next. We want gem versions from both Gemfiles to be in the
 # app for parity with the production slug.
 echo "-----> Installing Gemfile_next gems"
+cd $BUILD_DIR
 BUNDLE_GEMFILE=Gemfile_next bundle install --without development --path vendor/bundle --binstubs vendor/bundle/bin -j4 --deployment
 
 echo "-----> Writing .profile.d/multiple-gemfiles.sh to run on dyno startup"
-mkdir -p $BUILD_DIR/.profile.d
-cat<<\EOF > $BUILD_DIR/.profile.d/multiple-gemfiles.sh
+mkdir .profile.d
+cat<<\EOF > .profile.d/multiple-gemfiles.sh
 # if [ -n "$DEPENDENCIES_NEXT_DYNOS" ]; then
 if [ -n "$DEPENDENCIES_NEXT_CI_NODES" ]; then
   # Split on comma into an array of dynos
