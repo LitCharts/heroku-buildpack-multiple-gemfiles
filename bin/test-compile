@@ -41,16 +41,17 @@ BUNDLE_GEMFILE=Gemfile_next bundle install --without development --path vendor/b
 echo "-----> Writing .profile.d/multiple-gemfiles.sh to run on dyno startup"
 mkdir -p $BUILD_DIR/.profile.d
 cat<<\EOF > $BUILD_DIR/.profile.d/multiple-gemfiles.sh
-if [ -n "$DEPENDENCIES_NEXT_DYNOS" ]; then
+# if [ -n "$DEPENDENCIES_NEXT_DYNOS" ]; then
+if [ -n "$DEPENDENCIES_NEXT_CI_NODES" ]; then
   # Split on comma into an array of dynos
   # TODO: Test on string without comma but single dyno name
-  next_dynos=($(echo $DEPENDENCIES_NEXT_DYNOS | tr "," " "))
+  next_dynos=($(echo $DEPENDENCIES_NEXT_CI_NODES | tr "," " "))
 
-  if [ -n "$DYNO" ]; then
-    dyno=$DYNO
-  elif [ -n "$CI_NODE_INDEX" ]; then
+  # if [ -n "$DYNO" ]; then
+    # dyno=$DYNO
+  # elif [ -n "$CI_NODE_INDEX" ]; then
     dyno=$CI_NODE_INDEX
-  fi
+  # fi
 
   echo "Preparing Gemfile for dyno: $dyno"
 
