@@ -31,27 +31,40 @@ function indent() {
   esac
 }
 
-if (( $RANDOM % 2 == 0 )); then
-  # TODO: Ask Heroku if env vars can be made available to all buildpacks sooner: CI_NODE_INDEX, CI_NODE_TOTAL
-  echo "-----> Setting DEPENDENCIES_NEXT"
-  export DEPENDENCIES_NEXT=1
-  echo "export DEPENDENCIES_NEXT=$DEPENDENCIES_NEXT" >> $BUILDPACK_DIR/export
 
-  echo "-----> Shuffling Gemfiles"
+# The heroku ruby buildpack will have already installed the gems for the default Gemfile, so now
+# install the missing gems from Gemfile_next. We want gem versions from both Gemfiles to be in the
+# app for parity with the production slug.
+echo "-----> Installing Gemfile_next gems"
+BUNDLE_GEMFILE=Gemfile_next bundle install --without development --path vendor/bundle --binstubs vendor/bundle/bin -j4 --deployment
 
-  echo "Moving Gemfile to Gemfile_prev" | indent
-  mv "$BUILD_DIR/Gemfile" "$BUILD_DIR/Gemfile_prev"
+echo "-----> Writing .profile.d/multiple-gemfiles.sh to run on dyno startup"
+mkdir -p $BUILD_DIR/.profile.d
+cat<<\EOF > $BUILD_DIR/.profile.d/multiple-gemfiles.sh
+if [ -n "$DEPENDENCIES_NEXT_DYNOS" ]; then
+  # Split on comma into an array of dynos
+  # TODO: Test on string without comma but single dyno name
+  next_dynos=($(echo $DEPENDENCIES_NEXT_DYNOS | tr "," " "))
 
-  echo "Moving Gemfile.lock to Gemfile_prev.lock" | indent
-  mv "$BUILD_DIR/Gemfile.lock" "$BUILD_DIR/Gemfile_prev.lock"
+  if [ -n "$DYNO" ]; then
+    dyno=$DYNO
+  elif [ -n "$CI_NODE_INDEX" ]; then
+    dyno=$CI_NODE_INDEX
+  fi
 
-  echo "Moving Gemfile_next to Gemfile" | indent
-  mv "$BUILD_DIR/Gemfile_next" "$BUILD_DIR/Gemfile"
+  echo "Preparing Gemfile for dyno: $dyno"
 
-  echo "Moving Gemfile_next.lock to Gemfile.lock" | indent
-  mv "$BUILD_DIR/Gemfile_next.lock" "$BUILD_DIR/Gemfile.lock"
-else
-  echo "-----> Use default Gemfile and Gemfile.lock"
+  for ((i=0; i<${#next_dynos[@]}; i++)); do
+    if [[ ${next_dynos[$i]} == ${dyno} ]]; then
+      echo "Shuffling Gemfiles to use Gemfile_next"
+      export DEPENDENCIES_NEXT=1
+      mv "$HOME/Gemfile" "$HOME/Gemfile_prev"
+      mv "$HOME/Gemfile.lock" "$HOME/Gemfile_prev.lock"
+      mv "$HOME/Gemfile_next" "$HOME/Gemfile"
+      mv "$HOME/Gemfile_next.lock" "$HOME/Gemfile.lock"
+    fi
+  done
 fi
+EOF
 
 echo "-----> Multiple Gemfiles done"
