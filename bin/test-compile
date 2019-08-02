@@ -37,7 +37,7 @@ function indent() {
 # app for parity with the production slug.
 echo "-----> Installing Gemfile_next gems"
 cd $BUILD_DIR
-BUNDLE_GEMFILE=Gemfile_next bundle install --without development --path vendor/bundle --binstubs vendor/bundle/bin -j4 --deployment
+BUNDLE_GEMFILE=Gemfile_next bundle install --without development --path vendor/bundle --binstubs vendor/bundle/bin -j4 --deployment | indent
 
 echo "-----> Writing .profile.d/multiple-gemfiles.sh to run on dyno startup"
 mkdir -p .profile.d
