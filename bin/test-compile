@@ -60,16 +60,27 @@ if [ -n "$DEPENDENCIES_NEXT_CI_NODES" ]; then
 
   for ((i=0; i<${#next_dynos[@]}; i++)); do
     if [[ ${next_dynos[$i]} == ${dyno} ]]; then
-      echo "Setting DEPENDENCIES_NEXT for dyno: $dyno"
-      export DEPENDENCIES_NEXT=1
+      # echo "[multiple-gemfiles.sh] Setting DEPENDENCIES_NEXT for dyno: $dyno"
+      # export DEPENDENCIES_NEXT=true
 
       if [ -e $HOME/Gemfile_next ]; then
-        echo "Preparing Gemfile for dyno: $dyno"
-        echo "Shuffling Gemfiles to use Gemfile_next"
-        mv "$HOME/Gemfile" "$HOME/Gemfile_prev"
-        mv "$HOME/Gemfile.lock" "$HOME/Gemfile_prev.lock"
-        mv "$HOME/Gemfile_next" "$HOME/Gemfile"
-        mv "$HOME/Gemfile_next.lock" "$HOME/Gemfile.lock"
+        echo "[multiple-gemfiles.sh] Preparing env vars for dyno: $dyno"
+        echo "---------------------> Setting DEPENDENCIES_NEXT=true"
+        export DEPENDENCIES_NEXT=true
+        echo "---------------------> Setting BUNDLE_GEMFILE=Gemfile_next"
+        export BUNDLE_GEMFILE=Gemfile_next
+        # echo "[multiple-gemfiles.sh] Preparing Gemfile for dyno: $dyno"
+        # echo "[multiple-gemfiles.sh] Shuffling Gemfiles to use Gemfile_next"
+        # mv "$HOME/Gemfile" "$HOME/Gemfile_prev"
+        # mv "$HOME/Gemfile.lock" "$HOME/Gemfile_prev.lock"
+        # mv "$HOME/Gemfile_next" "$HOME/Gemfile"
+        # mv "$HOME/Gemfile_next.lock" "$HOME/Gemfile.lock"
+      else
+        echo "[multiple-gemfiles.sh] Preparing env vars for dyno: $dyno"
+        echo "---------------------> Unsetting DEPENDENCIES_NEXT"
+        unset DEPENDENCIES_NEXT
+        echo "---------------------> Unsetting BUNDLE_GEMFILE"
+        unset BUNDLE_GEMFILE
       fi
     fi
   done
