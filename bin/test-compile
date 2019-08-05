@@ -46,44 +46,38 @@ BUNDLE_GEMFILE=Gemfile_next bundle install --without development --path vendor/b
 echo "-----> Writing .profile.d/multiple-gemfiles.sh to run on dyno startup"
 mkdir -p .profile.d
 cat<<\EOF > .profile.d/multiple-gemfiles.sh
-# if [ -n "$DEPENDENCIES_NEXT_DYNOS" ]; then
-if [ -n "$DEPENDENCIES_NEXT_CI_NODES" ]; then
-  # Split on comma into an array of dynos
-  # TODO: Test on string without comma but single dyno name
-  next_dynos=($(echo $DEPENDENCIES_NEXT_CI_NODES | tr "," " "))
+if [ -n "$CI_NODE_INDEX" ]; then
+  server_id=$CI_NODE_INDEX
+elif [ -n "$DYNO" ]; then
+  server_id=$DYNO
+fi
 
-  if [ -n "$CI_NODE_INDEX" ]; then
-    dyno=$CI_NODE_INDEX
-  elif [ -n "$DYNO" ]; then
-    dyno=$DYNO
-  fi
+echo "[multiple-gemfiles.sh] Preparing env vars for server: $server_id"
+echo "---------------------> Unsetting DEPENDENCIES_NEXT"
+unset DEPENDENCIES_NEXT
+echo "---------------------> Unsetting BUNDLE_GEMFILE"
+unset BUNDLE_GEMFILE
 
-  for ((i=0; i<${#next_dynos[@]}; i++)); do
-    if [[ ${next_dynos[$i]} == ${dyno} ]]; then
-      # echo "[multiple-gemfiles.sh] Setting DEPENDENCIES_NEXT for dyno: $dyno"
-      # export DEPENDENCIES_NEXT=true
+if [ -e $HOME/Gemfile_next ]; then
+  if [ -n "$DEPENDENCIES_NEXT_CI_NODES" ]; then
+    # DEPENDENCIES_NEXT_CI_NODES is a comma-separated string of CI node indexes that should
+    # use Gemfile_next, e.g. DEPENDENCIES_NEXT_CI_NODES=5,6,7
+    #
+    # DEPENDENCIES_NEXT_DYNOS is a comma-separated string of dynos that should use Gemfile_next,
+    # e.g. DEPENDENCIES_NEXT_DYNOS=web.9,web.10,worker.9,worker.10,resque.3
+    #
+    # Split on comma into an array of server_ids
+    next_servers=($(echo $DEPENDENCIES_NEXT_CI_NODES | tr "," " "))
 
-      if [ -e $HOME/Gemfile_next ]; then
-        echo "[multiple-gemfiles.sh] Preparing env vars for dyno: $dyno"
+    for ((i=0; i<${#next_servers[@]}; i++)); do
+      if [[ ${next_servers[$i]} == ${server_id} ]]; then
         echo "---------------------> Setting DEPENDENCIES_NEXT=true"
         export DEPENDENCIES_NEXT=true
         echo "---------------------> Setting BUNDLE_GEMFILE=$HOME/Gemfile_next"
         export BUNDLE_GEMFILE=$HOME/Gemfile_next
-        # echo "[multiple-gemfiles.sh] Preparing Gemfile for dyno: $dyno"
-        # echo "[multiple-gemfiles.sh] Shuffling Gemfiles to use Gemfile_next"
-        # mv "$HOME/Gemfile" "$HOME/Gemfile_prev"
-        # mv "$HOME/Gemfile.lock" "$HOME/Gemfile_prev.lock"
-        # mv "$HOME/Gemfile_next" "$HOME/Gemfile"
-        # mv "$HOME/Gemfile_next.lock" "$HOME/Gemfile.lock"
-      else
-        echo "[multiple-gemfiles.sh] Preparing env vars for dyno: $dyno"
-        echo "---------------------> Unsetting DEPENDENCIES_NEXT"
-        unset DEPENDENCIES_NEXT
-        echo "---------------------> Unsetting BUNDLE_GEMFILE"
-        unset BUNDLE_GEMFILE
       fi
-    fi
-  done
+    done
+  fi
 fi
 EOF
 
