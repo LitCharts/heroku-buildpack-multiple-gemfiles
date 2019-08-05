@@ -67,8 +67,8 @@ if [ -n "$DEPENDENCIES_NEXT_CI_NODES" ]; then
         echo "[multiple-gemfiles.sh] Preparing env vars for dyno: $dyno"
         echo "---------------------> Setting DEPENDENCIES_NEXT=true"
         export DEPENDENCIES_NEXT=true
-        echo "---------------------> Setting BUNDLE_GEMFILE=Gemfile_next"
-        export BUNDLE_GEMFILE=Gemfile_next
+        echo "---------------------> Setting BUNDLE_GEMFILE=$HOME/Gemfile_next"
+        export BUNDLE_GEMFILE=$HOME/Gemfile_next
         # echo "[multiple-gemfiles.sh] Preparing Gemfile for dyno: $dyno"
         # echo "[multiple-gemfiles.sh] Shuffling Gemfiles to use Gemfile_next"
         # mv "$HOME/Gemfile" "$HOME/Gemfile_prev"
