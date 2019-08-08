@@ -1,5 +1,12 @@
 #!/usr/bin/env bash
 # bin/detect <build-dir>
 
-echo 'Multiple Gemfiles'
-exit 0
+# parse and derive params
+BUILD_DIR=$1
+
+if [ -e $BUILD_DIR/Gemfile_next ]; then
+  echo 'Multiple Gemfiles'
+  exit 0
+fi
+
+exit 1
