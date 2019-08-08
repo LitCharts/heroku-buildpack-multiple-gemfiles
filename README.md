@@ -13,7 +13,7 @@ same Heroku environment. For example, you could have some of your dynos running 
 
 ## Setup
 
-1. **WARNING** You should not assume my copy of this repo to continue to exist, or be stable, or secure for your application in the future. Fork this repo so you have a copy under your control under your own GitHub account.
+1. **WARNING** You should not assume my copy of this repo will continue to exist, or be stable, or secure for your application in the future. Fork this repo so you have a copy under your control under your own GitHub account.
 
 2. Add a buildpack after your existing heroku/ruby buildpack. For `app.json` see below. Replace `YOUR-GITHUB-ACCOUNT` with your GitHub user/org name.
 
@@ -40,7 +40,7 @@ BUNDLE_GEMFILE=Gemfile_next bundle install
 For example, if you have 4 CI nodes in total, and you want the first 2 nodes to use `Gemfile` (the default), and the last 2 nodes to use `Gemfile_next`, set the following:
 
 ```
-"DEPENDENCIES_NEXT_CI_NODES": "2,3",
+"DEPENDENCIES_NEXT_CI_NODES": "2,3"
 ```
 
 (CI nodes are zero-indexed.)
