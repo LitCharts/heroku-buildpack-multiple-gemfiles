@@ -62,3 +62,10 @@ When Heroku builds your app, these additional steps are performed by this buildp
 ## Rollback to Gemfile
 
 If you need to rollback to using `Gemfile` on a dyno instead of `Gemfile_next`, change the value of `DEPENDENCIES_NEXT_DYNOS`. All dynos will restart and only those dynos specified in `DEPENDENCIES_NEXT_DYNOS` will use `Gemfile_next`. All other dynos will use `Gemfile`. If you want no dynos to use `Gemfile_next`, you can delete the `DEPENDENCIES_NEXT_DYNOS` environment variable.
+
+
+## How to run a Rails console using Gemfile_next
+
+```sh
+heroku run --app YOUR_HEROKU_APP_NAME -- BUNDLE_GEMFILE=Gemfile_next bundle exec rails console
+```
