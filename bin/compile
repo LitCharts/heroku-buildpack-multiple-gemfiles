@@ -33,17 +33,12 @@ function indent() {
 
 
 # The heroku ruby buildpack will have already installed the gems for the default Gemfile, so now
-# install the missing gems from Gemfile_next. We want gem versions from both Gemfiles to be in the
-# app for parity with the production slug.
+# install the missing gems from Gemfile_next.
 echo "-----> Installing Gemfile_next gems"
 cd $BUILD_DIR
 bundle_without="development:test"
 BUNDLE_GEMFILE=Gemfile_next bundle install --without $bundle_without --path vendor/bundle --binstubs vendor/bundle/bin -j4 --deployment | indent
 
-# TODO: On a dyno restart, is a fresh slug used or will the existing slug be used with the
-# Gemfiles already shuffled? Consider using BUNDLE_GEMFILE env var instead. Or always reset
-# files on startup, moving Gemfile_prev back to Gemfile etc.? Need to make sure that if
-# a dyno is removed from DEPENDENCIES_NEXT_DYNOS that it uses the old Gemfile on restart.
 echo "-----> Writing .profile.d/multiple-gemfiles.sh to run on dyno startup"
 mkdir -p .profile.d
 cat<<\EOF > .profile.d/multiple-gemfiles.sh
