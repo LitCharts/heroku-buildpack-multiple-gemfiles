@@ -45,9 +45,11 @@ For example, if you have 4 CI nodes in total, and you want the first 2 nodes to 
 
 (CI nodes are zero-indexed.)
 
-7. To specify which dynos use `Gemfile_next`, set the `DEPENDENCIES_NEXT_DYNOS` environment variable to a comma-separated string of dyno names.
+7. To specify which dynos use `Gemfile_next`, set the `DEPENDENCIES_NEXT_DYNOS` environment variable to a comma-separated string of dyno names with glob/wildcard (`*`) support.
 
-`DEPENDENCIES_NEXT_DYNOS=web.5,web.6,worker.3` would cause dynos `web.5`, `web.6`, and `worker.3` to use `Gemfile_next`. All other dynos would use `Gemfile` by default.
+- `DEPENDENCIES_NEXT_DYNOS=*` would cause all dynos to use `Gemfile_next`.
+- `DEPENDENCIES_NEXT_DYNOS=worker.1,scheduler.*,web.*,run.*` would cause `worker.1` and all `scheduler`, `web` and one-off `run` dynos to use `Gemfile_next`. All other dynos would use `Gemfile`.
+- `DEPENDENCIES_NEXT_DYNOS=web.5,web.6,worker.3` would cause dynos `web.5`, `web.6`, and `worker.3` to use `Gemfile_next`. All other dynos would use `Gemfile`.
 
 
 ## How it works

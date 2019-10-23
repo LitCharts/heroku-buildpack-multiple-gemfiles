@@ -31,7 +31,6 @@ function indent() {
   esac
 }
 
-
 # The heroku ruby buildpack will have already installed the gems for the default Gemfile, so now
 # install the missing gems from Gemfile_next.
 echo "-----> Installing Gemfile_next gems"
@@ -51,22 +50,47 @@ echo "---------------------> Unsetting BUNDLE_GEMFILE"
 unset BUNDLE_GEMFILE
 
 # DEPENDENCIES_NEXT_DYNOS is a comma-separated string of dynos that should use Gemfile_next,
-# e.g. DEPENDENCIES_NEXT_DYNOS=web.9,web.10,worker.9,worker.10,resque.3
+# and glob wildcards can be used in the following ways:
+#     * => matches all dynos (*.* also works the same)
+# web.* => matches all web dynos
+#   *.2 => matches all dynos with index 2, e.g. web.2, worker.2, resque.2, etc.
+#
+# Examples:
+#               Selected dynos only: DEPENDENCIES_NEXT_DYNOS=web.9,web.10,worker.10,resque.3
+#                         All dynos: DEPENDENCIES_NEXT_DYNOS=*
+#   All scheduler and one-off dynos: DEPENDENCIES_NEXT_DYNOS=scheduler.*,run.*
+# web.1, web.2 and all worker dynos: DEPENDENCIES_NEXT_DYNOS=web.1,web.2,worker.*
+#           All index 1 and 2 dynos: DEPENDENCIES_NEXT_DYNOS=*.1,*.2
 next_server_ids=$DEPENDENCIES_NEXT_DYNOS
 
-if [ -n "$next_server_ids" ]; then
-  # Split on comma into an array
-  next_servers=($(echo $next_server_ids | tr "," " "))
+function is_next_server() {
+  # Split on comma into next_servers array
+  IFS=',' # set comma as delimiter
+  read -ra next_servers <<< "$next_server_ids" # split on comma delimiter
 
-  for ((i=0; i<${#next_servers[@]}; i++)); do
-    if [[ ${next_servers[$i]} == ${server_id} ]]; then
-      echo "---------------------> Setting DEPENDENCIES_NEXT=true"
-      export DEPENDENCIES_NEXT=true
-      echo "---------------------> Setting BUNDLE_GEMFILE=$HOME/Gemfile_next"
-      export BUNDLE_GEMFILE=$HOME/Gemfile_next
+  for next_server in "${next_servers[@]}"; do
+    # This supports glob matching (*)
+    if [[ "$server_id" == $next_server ]]; then
+      # matches => this server will use Gemfile_next.
+      true
+      return
     fi
   done
+
+  # No match => this server will use Gemfile.
+  false
+  return
+}
+
+if [ -n "$next_server_ids" ]; then
+  if is_next_server; then
+    echo "---------------------> Setting DEPENDENCIES_NEXT=true"
+    export DEPENDENCIES_NEXT=true
+    echo "---------------------> Setting BUNDLE_GEMFILE=$HOME/Gemfile_next"
+    export BUNDLE_GEMFILE=$HOME/Gemfile_next
+  fi
 fi
+
 EOF
 
 echo "-----> Multiple Gemfiles done"
