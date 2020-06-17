@@ -53,8 +53,8 @@ server_id=$DYNO
 echo "[multiple-gemfiles.sh] Preparing env vars for server: $server_id"
 echo "---------------------> Unsetting DEPENDENCIES_NEXT"
 unset DEPENDENCIES_NEXT
-echo "---------------------> Unsetting BUNDLE_GEMFILE"
-unset BUNDLE_GEMFILE
+echo "---------------------> setting BUNDLE_GEMFILE as default Gemfile"
+export BUNDLE_GEMFILE=$HOME/Gemfile
 
 # DEPENDENCIES_NEXT_DYNOS is a comma-separated string of dynos that should use Gemfile_next,
 # and glob wildcards can be used in the following ways:
