@@ -31,12 +31,18 @@ function indent() {
   esac
 }
 
+bundle_without='development:test'
+if [ -f "$ENV_DIR/BUNDLE_WITHOUT" ]
+then
+  bundle_without="$(cat $ENV_DIR/BUNDLE_WITHOUT)"
+fi
+
 # The heroku ruby buildpack will have already installed the gems for the default Gemfile, so now
 # install the missing gems from Gemfile_next.
 echo "-----> Installing Gemfile_next gems"
 cd $BUILD_DIR
-bundle_without="development:test"
 set -o pipefail # Enable pipefail so failure exit code from bundle install will not be lost by pipe to indent.
+echo "       Running: BUNDLE_GEMFILE=Gemfile_next bundle install --without $bundle_without --path vendor/bundle --binstubs vendor/bundle/bin -j4 --deployment"
 BUNDLE_GEMFILE=Gemfile_next bundle install --without $bundle_without --path vendor/bundle --binstubs vendor/bundle/bin -j4 --deployment | indent
 bundle_install_status=$?
 set +o pipefail # Disable pipefail, only needed for above command as it is pipes to indent.
