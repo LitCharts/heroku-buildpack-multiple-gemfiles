@@ -35,12 +35,6 @@ function indent() {
 # install the missing gems from Gemfile_next.
 echo "-----> Installing Gemfile_next gems"
 cd $BUILD_DIR
-
-# Get bundler version from BUNDLED WITH in Gemfile_next, is last line of that file.
-export BUNDLE_VERSION=$(tail -n1 Gemfile_next.lock)
-# Install version of bundler specified in Gemfile_next
-gem install bundler -v $BUNDLE_VERSION
-
 bundle_without="development:test"
 set -o pipefail # Enable pipefail so failure exit code from bundle install will not be lost by pipe to indent.
 BUNDLE_GEMFILE=Gemfile_next bundle install --without $bundle_without --path vendor/bundle --binstubs vendor/bundle/bin -j4 --deployment | indent
