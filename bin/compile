@@ -32,17 +32,17 @@ function indent() {
 }
 
 # The heroku ruby buildpack will have already installed the gems for the default Gemfile, so now
-# install the missing gems from Gemfile.rails5.
-echo "-----> Installing Gemfile.rails5 gems"
+# install the missing gems from Gemfile.rails6.
+echo "-----> Installing Gemfile.rails6 gems"
 cd $BUILD_DIR
 bundle_without="development:test"
 set -o pipefail # Enable pipefail so failure exit code from bundle install will not be lost by pipe to indent.
-BUNDLE_GEMFILE=Gemfile.rails5 bundle install --without $bundle_without --path vendor/bundle --binstubs vendor/bundle/bin -j4 --deployment | indent
+BUNDLE_GEMFILE=Gemfile.rails6 bundle install --without $bundle_without --path vendor/bundle --binstubs vendor/bundle/bin -j4 --deployment | indent
 bundle_install_status=$?
 set +o pipefail # Disable pipefail, only needed for above command as it is pipes to indent.
 
 if [ $bundle_install_status -ne 0 ]; then
-  error "bundle install error: This can happen when Gemfile.rails5.lock falls out of sync with Gemfile.rails5. Check the committed Gemfile.rails5.lock is up-to-date."
+  error "bundle install error: This can happen when Gemfile.rails6.lock falls out of sync with Gemfile.rails6. Check the committed Gemfile.rails6.lock is up-to-date."
 fi
 
 echo "-----> Writing .profile.d/multiple-gemfiles.sh to run on dyno startup"
@@ -56,7 +56,7 @@ unset DEPENDENCIES_NEXT
 echo "---------------------> Unsetting BUNDLE_GEMFILE"
 unset BUNDLE_GEMFILE
 
-# DEPENDENCIES_NEXT_DYNOS is a comma-separated string of dynos that should use Gemfile.rails5,
+# DEPENDENCIES_NEXT_DYNOS is a comma-separated string of dynos that should use Gemfile.rails6,
 # and glob wildcards can be used in the following ways:
 #     * => matches all dynos (*.* also works the same)
 # web.* => matches all web dynos
@@ -78,7 +78,7 @@ function is_next_server() {
   for next_server in "${next_servers[@]}"; do
     # This supports glob matching (*)
     if [[ "$server_id" == $next_server ]]; then
-      # matches => this server will use Gemfile.rails5.
+      # matches => this server will use Gemfile.rails6.
       true
       return
     fi
@@ -93,8 +93,8 @@ if [ -n "$next_server_ids" ]; then
   if is_next_server; then
     echo "---------------------> Setting DEPENDENCIES_NEXT=true"
     export DEPENDENCIES_NEXT=true
-    echo "---------------------> Setting BUNDLE_GEMFILE=$HOME/Gemfile.rails5"
-    export BUNDLE_GEMFILE=$HOME/Gemfile.rails5
+    echo "---------------------> Setting BUNDLE_GEMFILE=$HOME/Gemfile.rails6"
+    export BUNDLE_GEMFILE=$HOME/Gemfile.rails6
   fi
 fi
 

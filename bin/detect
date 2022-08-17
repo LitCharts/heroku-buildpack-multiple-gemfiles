@@ -4,7 +4,7 @@
 # parse and derive params
 BUILD_DIR=$1
 
-if [ -e $BUILD_DIR/Gemfile.rails5 ]; then
+if [ -e $BUILD_DIR/Gemfile.rails6 ]; then
   echo 'Multiple Gemfiles'
   exit 0
 fi
