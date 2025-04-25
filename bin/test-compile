@@ -47,9 +47,9 @@ if [ $bundle_install_status -ne 0 ]; then
   error "bundle install error: This can happen when Gemfile_next.lock falls out of sync with Gemfile_next. Check the committed Gemfile_next.lock is up-to-date."
 fi
 
-# Delete .git directories cloned when bundler installed any git-hosted gems
+# Delete git data from bundler installing any git-hosted gems, e.g. when gemfile specifies a rails branch
 shopt -s globstar # Set globstar on to force ** to match multiple directories
-rm -rf vendor/bundle/**/.git
+rm -rf vendor/bundle/**/.git vendor/bundle/ruby/*/cache/bundler/git
 
 echo "-----> Writing .profile.d/multiple-gemfiles.sh to run on dyno startup"
 mkdir -p .profile.d
