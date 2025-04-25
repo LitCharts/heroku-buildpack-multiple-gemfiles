@@ -48,7 +48,8 @@ if [ $bundle_install_status -ne 0 ]; then
 fi
 
 # Delete .git directories cloned when bundler installed any git-hosted gems
-rm -rfd vendor/bundle/**/.git
+shopt -s globstar # Set globstar on to force ** to match multiple directories
+rm -rf vendor/bundle/**/.git
 
 echo "-----> Writing .profile.d/multiple-gemfiles.sh to run on dyno startup"
 mkdir -p .profile.d
